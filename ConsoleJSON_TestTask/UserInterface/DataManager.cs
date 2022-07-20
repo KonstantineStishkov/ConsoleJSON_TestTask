@@ -1,10 +1,6 @@
 ﻿using EmployeeData;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UserInterface
 {
@@ -219,7 +215,7 @@ namespace UserInterface
                     return item.ToString();
             }
 
-            return string.Format("There is no Employee with id = {0}", id);
+            return string.Format(errorIdFormatMessage, id);
         }
 
         private string GetAll()
@@ -237,7 +233,7 @@ namespace UserInterface
             }
 
             if (builder.Length == 0)
-                return string.Format("Employee list is empty");
+                return string.Format(errorEmptyListMessage);
             else
                 return builder.ToString();
         }
@@ -257,13 +253,20 @@ namespace UserInterface
 
         private bool SaveEmployeeList(List<Employee> employees)
         {
-            using (JsonTextWriter jsonWriter = new JsonTextWriter(File.CreateText(FilePath)))
+            try
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(jsonWriter, employees);
-            }
+                using (JsonTextWriter jsonWriter = new JsonTextWriter(File.CreateText(FilePath)))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(jsonWriter, employees);
+                }
 
-            return true;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
