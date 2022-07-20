@@ -2,7 +2,6 @@
   "profiles": {
     "UserInterface": {
       "commandName": "Project",
-      "commandLineArgs": "-add FirstName:John LastName:Doe Salary:100,5",
       "workingDirectory": "C:\\Unity\\Test_tasks\\ConsoleJSON\\ConsoleJSON_TestTask"
     }
   }

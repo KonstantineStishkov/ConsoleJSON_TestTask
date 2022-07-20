@@ -19,6 +19,7 @@ namespace UserInterface
         const string errorOperationMessage = "No such operation";
         const string errorNoFileFormatMessage = "No such file {0}";
         const string errorArgumentFormatMessage = "Invalid value( {0} ) for property: {1}";
+        const string errorNoArgumentsMessage = "No arguments provided";
         const string errorNoValueFormatMessage = "No value for property: {1} provided";
         const string errorIdFormatMessage = "There is no Employee with Id = {0}";
         const string errorEmptyListMessage = "List of Employees is empty";
@@ -38,10 +39,18 @@ namespace UserInterface
             FilePath = Path.GetFullPath(filePathRelative);
         }
 
+        /// <summary>
+        /// Make requiered operation with json text file
+        /// </summary>
+        /// <param name="input">array of operation type and arguments</param>
+        /// <returns>result of operation</returns>
         public string MakeOperation(string[] input)
         {
             if (!File.Exists(FilePath))
                 return string.Format(errorNoFileFormatMessage, FilePath);
+
+            if (input.Length == 0)
+                return errorNoArgumentsMessage;
 
             string[] values = GetVauesOfProperties(input);
             string operation = input[0];
@@ -76,6 +85,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Transforms raw input to array of values for Employee properties
+        /// </summary>
+        /// <param name="input">console input with operation type and arguments for it</param>
+        /// <returns>values</returns>
         private string[] GetVauesOfProperties(string[] input)
         {
             const int leftSubStringIndex = 0;
@@ -94,6 +108,11 @@ namespace UserInterface
             return values;
         }
 
+        /// <summary>
+        /// Operation: Add. Adds new Employee to json file
+        /// </summary>
+        /// <param name="values">Array of values for Employee properties</param>
+        /// <returns>Message describes if adding was successful</returns>
         private string Add(string[] values)
         {
             string value = values[(int)EmployeeProperties.FirstName];
@@ -134,6 +153,11 @@ namespace UserInterface
             return successMessage;
         }
 
+        /// <summary>
+        /// Operation: Update. Updates existed Employee in json file
+        /// </summary>
+        /// <param name="values">Array of values for Employee properties. Id Requiered, others - optional but at least one valid is requiered</param>
+        /// <returns>Message describes if updating was successful</returns>
         private string Update(string[] values)
         {
             bool hasValidValues = false;
@@ -189,6 +213,12 @@ namespace UserInterface
             return SaveEmployeeList(employees) ? successMessage : errorOperationMessage;
 
         }
+
+        /// <summary>
+        /// Operation: Delete. Deletes Employee from json file.
+        /// </summary>
+        /// <param name="id">Employee id</param>
+        /// <returns>Message describes if deleting was successful</returns>
         private string Delete(int id)
         {
             List<Employee>? employees = GetEmployeeList();
@@ -202,6 +232,11 @@ namespace UserInterface
             return successMessage;
         }
 
+        /// <summary>
+        /// Operation: Get. Gets Employee by Id from json file.
+        /// </summary>
+        /// <param name="id">Employee id</param>
+        /// <returns>Message that contains full info about Employee</returns>
         private string Get(int id)
         {
             List<Employee>? employees = GetEmployeeList();
@@ -218,6 +253,10 @@ namespace UserInterface
             return string.Format(errorIdFormatMessage, id);
         }
 
+        /// <summary>
+        /// Operation: GetAll. Gets all Employees from json file.
+        /// </summary>
+        /// <returns>Message that contains full info about every Employee line by line</returns>
         private string GetAll()
         {
             List<Employee>? employees = GetEmployeeList();
@@ -238,6 +277,10 @@ namespace UserInterface
                 return builder.ToString();
         }
 
+        /// <summary>
+        /// Read json file and returns list of Employees
+        /// </summary>
+        /// <returns></returns>
         private List<Employee>? GetEmployeeList()
         {
             List<Employee>? employees;
@@ -251,6 +294,11 @@ namespace UserInterface
             return employees;
         }
 
+        /// <summary>
+        /// Writes all employees info to json file
+        /// </summary>
+        /// <param name="employees"></param>
+        /// <returns>if it was successful</returns>
         private bool SaveEmployeeList(List<Employee> employees)
         {
             try

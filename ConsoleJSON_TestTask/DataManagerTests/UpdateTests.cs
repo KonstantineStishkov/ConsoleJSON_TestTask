@@ -58,6 +58,7 @@ namespace DataManagerTests
         [TestCase("Invalid value( quitelot ) for property: SalaryPerHour", "-update", "Id:2", "LastName:Bond", "Salary:quitelot")]
         [TestCase("Request has no valid values", "-update", "Id:2")]
         [TestCase("There is no Employee with Id = 127", "-update", "Id:127", "LastName:Bond")]
+        [TestCase("No arguments provided")]
         public void UpdateWrongValuesTest(string expected, params string[] args)
         {
             DataManager manager = new DataManager(path);
