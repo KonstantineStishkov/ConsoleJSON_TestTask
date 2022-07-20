@@ -2,6 +2,7 @@
   "profiles": {
     "UserInterface": {
       "commandName": "Project",
+      "commandLineArgs": "-getall",
       "workingDirectory": "C:\\Unity\\Test_tasks\\ConsoleJSON\\ConsoleJSON_TestTask"
     }
   }

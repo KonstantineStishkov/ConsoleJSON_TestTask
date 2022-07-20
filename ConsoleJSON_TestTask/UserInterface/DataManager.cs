@@ -17,7 +17,7 @@ namespace UserInterface
         const string successMessage = "Operation is successfull";
 
         const string errorOperationMessage = "No such operation";
-        const string errorNoFileFormatMessage = "No such file {0}";
+        const string errorNoFileFormatMessage = "No such file or file marked as read only {0}";
         const string errorArgumentFormatMessage = "Invalid value( {0} ) for property: {1}";
         const string errorNoArgumentsMessage = "No arguments provided";
         const string errorNoValueFormatMessage = "No value for property: {1} provided";
@@ -132,7 +132,10 @@ namespace UserInterface
                 return string.Format(errorArgumentFormatMessage, value, EmployeeProperties.SalaryPerHour);
 
             int id;
-            List<Employee>? employees = GetEmployeeList();
+            string message;
+            List<Employee>? employees;
+            if (!GetEmployeeList(out employees, out message))
+                return message;
 
             if (employees == null)
             {
@@ -165,7 +168,10 @@ namespace UserInterface
             if (!int.TryParse(value, out int id))
                 return string.Format(errorArgumentFormatMessage, value, EmployeeProperties.Id);
 
-            List<Employee>? employees = GetEmployeeList();
+            string message;
+            List<Employee>? employees;
+            if (!GetEmployeeList(out employees, out message))
+                return message;
 
             if (employees == null)
                 return errorEmptyListMessage;
@@ -221,7 +227,10 @@ namespace UserInterface
         /// <returns>Message describes if deleting was successful</returns>
         private string Delete(int id)
         {
-            List<Employee>? employees = GetEmployeeList();
+            string message;
+            List<Employee>? employees;
+            if (!GetEmployeeList(out employees, out message))
+                return message;
 
             if (employees == null)
                 return errorEmptyListMessage;
@@ -239,7 +248,10 @@ namespace UserInterface
         /// <returns>Message that contains full info about Employee</returns>
         private string Get(int id)
         {
-            List<Employee>? employees = GetEmployeeList();
+            string message;
+            List<Employee>? employees;
+            if (!GetEmployeeList(out employees, out message))
+                return message;
 
             if (employees == null)
                 return errorEmptyListMessage;
@@ -259,7 +271,11 @@ namespace UserInterface
         /// <returns>Message that contains full info about every Employee line by line</returns>
         private string GetAll()
         {
-            List<Employee>? employees = GetEmployeeList();
+            string message;
+            List<Employee>? employees;
+            if (!GetEmployeeList(out employees, out message))
+                return message;
+
             StringBuilder builder = new StringBuilder();
 
             if (employees == null)
@@ -281,17 +297,32 @@ namespace UserInterface
         /// Read json file and returns list of Employees
         /// </summary>
         /// <returns></returns>
-        private List<Employee>? GetEmployeeList()
+        private bool GetEmployeeList(out List<Employee>? employees, out string message)
         {
-            List<Employee>? employees;
-            using (FileStream stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read))
+            try
             {
-                JsonSerializer serializer = new JsonSerializer();
-                JsonTextReader jsonReader = new JsonTextReader(new StreamReader(stream));
-                employees = serializer.Deserialize<List<Employee>>(jsonReader);
-            }
+                using (FileStream stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    JsonTextReader jsonReader = new JsonTextReader(new StreamReader(stream));
+                    employees = serializer.Deserialize<List<Employee>>(jsonReader);
+                }
 
-            return employees;
+                if (employees == null)
+                {
+                    message = errorEmptyListMessage;
+                    return false;
+                }
+
+                message = string.Empty;
+                return true;
+            }
+            catch(IOException ex)
+            {
+                employees = null;
+                message = ex.Message;
+                return false;
+            }
         }
 
         /// <summary>
