@@ -1,0 +1,1 @@
+start UserInterface\bin\Release\net6.0\UserInterface.exe -getall
